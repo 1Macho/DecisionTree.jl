@@ -40,7 +40,7 @@ function _convert(
         labels :: Vector{T}) where {S, T}
 
     if node.is_leaf
-        return Leaf{T}(list[node.label], labels[node.region], :invalid)
+        return Leaf{T}(list[node.label], labels[node.region], [:invalid])
     else
         left = _convert(node.l, list, labels)
         right = _convert(node.r, list, labels)
@@ -119,7 +119,7 @@ function prune_tree(tree::LeafOrNode{S, T}, purity_thresh=1.0) where {S, T}
             matches = findall(all_labels .== majority)
             purity = length(matches) / length(all_labels)
             if purity >= purity_thresh
-                return Leaf{T}(majority, all_labels)
+                return Leaf{T}(majority, all_labels, [:invalid])
             else
                 return tree
             end
@@ -170,10 +170,10 @@ n_labels` matrix of probabilities, each row summing up to 1.
 (eg. ["versicolor", "virginica", "setosa"]). It specifies the column ordering
 of the output matrix. """
 function apply_tree_proba(leaf::Leaf{T}, features::Vector{S}, labels) where {S, T}
-    if leaf.cachedprobabilities == :invalid
-        leaf.cachedprobabilities = compute_probabilities(labels, leaf.values)
+    if leaf.cachedprobabilities[1] == :invalid
+        leaf.cachedprobabilities[1] = compute_probabilities(labels, leaf.values)
     end
-    return leaf.cachedprobabilities
+    return leaf.cachedprobabilities[1]
 end
 
 function apply_tree_proba(tree::Node{S, T}, features::Vector{S}, labels) where {S, T}
