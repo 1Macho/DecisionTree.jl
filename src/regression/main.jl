@@ -2,7 +2,7 @@ include("tree.jl")
 
 function _convert(node::treeregressor.NodeMeta{S}, labels::Array{T}) where {S, T <: Float64}
     if node.is_leaf
-        return Leaf{T}(node.label, labels[node.region])
+        return Leaf{T}(node.label, labels[node.region], :ivalid)
     else
         left = _convert(node.l, labels)
         right = _convert(node.r, labels)

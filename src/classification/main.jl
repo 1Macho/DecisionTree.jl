@@ -40,7 +40,7 @@ function _convert(
         labels :: Vector{T}) where {S, T}
 
     if node.is_leaf
-        return Leaf{T}(list[node.label], labels[node.region])
+        return Leaf{T}(list[node.label], labels[node.region], :invalid)
     else
         left = _convert(node.l, list, labels)
         right = _convert(node.r, list, labels)
@@ -169,8 +169,12 @@ n_labels` matrix of probabilities, each row summing up to 1.
 `col_labels` is a vector containing the distinct labels
 (eg. ["versicolor", "virginica", "setosa"]). It specifies the column ordering
 of the output matrix. """
-apply_tree_proba(leaf::Leaf{T}, features::Vector{S}, labels) where {S, T} =
-    compute_probabilities(labels, leaf.values)
+function apply_tree_proba(leaf::Leaf{T}, features::Vector{S}, labels) where {S, T}
+    if leaf.cachedprobabilities == :invalid
+        leaf.cachedprobabilities = compute_probabilities(labels, leaf.values)
+    end
+    return leaf.cachedprobabilities
+end
 
 function apply_tree_proba(tree::Node{S, T}, features::Vector{S}, labels) where {S, T}
     if tree.featval === nothing

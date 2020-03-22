@@ -29,6 +29,7 @@ export DecisionTreeClassifier, DecisionTreeRegressor, RandomForestClassifier,
 struct Leaf{T}
     majority :: T
     values   :: Vector{T}
+    cachedprobabilities
 end
 
 struct Node{S, T}
